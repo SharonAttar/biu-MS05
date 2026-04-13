@@ -1,27 +1,29 @@
-# Implementation Plan - Iris Classification with SVM
+# Implementation Plan - 4-Class Iris Classification
 
 ## Phase 1: Environment Setup
-1. Define the project directory structure.
-2. Ensure necessary libraries are available: `pandas`, `scikit-learn`, `matplotlib`, `seaborn`.
+1. Define the project structure.
+2. Ensure `iris.csv` exists (if not, create it from `sklearn` for consistency).
 
-## Phase 2: Data Loading & Preprocessing
-1. Load the Iris dataset.
-2. Explore the dataset structure (features, labels, class categories).
-3. Split the data into 80% Training and 20% Testing sets.
+## Phase 2: Synthetic Data Generation
+1. Load `iris.csv`.
+2. Analyze the range of features for existing classes (mean, standard deviation).
+3. Generate 50 synthetic rows for a new class **"Unknown"**.
+4. Use random values for the "Unknown" class to make it "challenging" but relevant.
+5. Append these rows and save the result as `iris_extended.csv`.
 
 ## Phase 3: Model Development
-1. Initialize the Support Vector Machine (SVM) classifier.
-2. Train the SVM model on the training set.
-3. Make predictions on the test set.
+1. Split `iris_extended.csv` into 80% Training and 20% Testing.
+2. Train a classification model (e.g., SVM).
+3. Predict results for the test set.
 
 ## Phase 4: Evaluation & Visualization
-1. Calculate the accuracy of the model.
-2. Generate a confusion matrix and a classification report.
-3. Create visualizations:
-   - A heatmap for the confusion matrix.
-   - A scatter plot or pairplot of features to visualize class separation.
+1. Metrics: Accuracy, Confusion Matrix, Classification Report.
+2. Plots:
+   - Confusion Matrix heatmap.
+   - Class distribution bar chart.
+   - Scatter plot showing original vs. synthetic classes in 2D space.
+3. Save all outputs to the `outputs/` folder.
 
 ## Phase 5: Finalization
-1. Save the metrics and plots to the `outputs/` folder.
-2. Create the remaining project documentation (`README.md`, `TODO.md`, etc.).
-3. Add comments to `main.py` explaining each step.
+1. Update `README.md` and `TODO.md`.
+2. Add comprehensive comments to `main.py`.

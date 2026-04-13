@@ -1,19 +1,19 @@
-# Task Tracking - Iris Classification
+# Task Tracking - 4-Class Iris Classification
 
 ## High Priority Tasks
-- [x] Initialize the project folder.
 - [x] Create `PRD.md`, `PLAN.md`, and `TODO.md`.
-- [x] Load and explore the Iris dataset in `main.py`.
-- [x] Split the dataset into 80/20 train/test.
-- [x] Train the SVM model on the training data.
-- [x] Evaluate the model and generate metrics.
-- [x] Create visualizations (confusion matrix, feature plot).
-- [x] Save metrics and plots to the `outputs/` directory.
-- [x] Write the `README.md` file.
+- [x] Ensure `iris.csv` exists in the project folder.
+- [x] Generate a synthetic fourth class in `main.py`.
+- [x] Merge the new class into `iris_extended.csv`.
+- [x] Train a classification model (SVM) on the 4-class dataset.
+- [x] Evaluate the model and save results to `outputs/`.
+- [x] Create visualizations (confusion matrix, class distribution).
+- [x] Update `README.md` with the explanation for the synthetic class.
+- [x] Add comments throughout `main.py`.
 
 ## Completed Tasks
-- [x] Initial research on Iris dataset and project requirements.
+- [x] Initial research on synthetic class generation.
 - [x] Drafting PRD and PLAN.
 - [x] Created `TODO.md`.
-- [x] Implemented `main.py` with full ML pipeline.
-- [x] Verified outputs and documentation.
+- [x] Implemented logic to handle local `iris.csv` and synthetic augmentation.
+- [x] Verified 4-class model performance (Accuracy: 0.80).

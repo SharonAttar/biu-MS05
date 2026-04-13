@@ -1,34 +1,38 @@
-# Iris Classification with Support Vector Machines (SVM)
+# 4-Class Iris Classification Project
 
-This project provides a clean and clear implementation for classifying Iris flower species using an SVM model. It covers the entire machine learning pipeline, from data exploration and preprocessing to training and evaluation.
+This project extends the classic Iris classification task by introducing a **synthetic fourth class** named "Unknown". The goal is to evaluate how well a machine learning model can handle added uncertainty and distinguish between established species and a challenging new synthetic category.
 
 ## 1. Project Overview
-The Iris dataset contains four features (sepal length, sepal width, petal length, and petal width) for three different species of Iris (Setosa, Versicolor, and Virginica). The goal of this project is to build an SVM model that accurately predicts the species based on these features.
+The dataset contains four features (sepal length, sepal width, petal length, and petal width) for:
+- 3 Original Species: Setosa, Versicolor, and Virginica.
+- **1 Synthetic Class**: "Unknown" (added to test classification boundaries and model robustness).
 
-## 2. Key Features
-- **Data Preprocessing**: Splits the data into training (80%) and testing (20%) sets.
-- **Model Selection**: Uses Support Vector Machines (SVM) for multi-class classification.
-- **Evaluation Metrics**: Reports accuracy, confusion matrix, and a detailed classification report.
-- **Visualizations**: Provides plots for the confusion matrix and feature relationships.
-- **Output Management**: Automatically saves metrics and plots to the `outputs/` folder.
+## 2. Why a Synthetic Class?
+Introducing a synthetic fourth class makes the classification task harder. The "Unknown" class is generated with random feature values that reside near the boundaries of the original data, forcing the model to learn more complex decision boundaries and testing its ability to handle out-of-distribution or ambiguous samples.
 
-## 3. Project Structure
-- `PRD.md`: Project requirements.
+## 3. Key Features
+- **Data Augmentation**: Automatically generates synthetic data for the "Unknown" class.
+- **Extended Dataset**: Exports the 4-class data to `iris_extended.csv`.
+- **Classification Model**: Uses a Support Vector Machine (SVM) for training.
+- **Full Evaluation**: Metrics include accuracy, confusion matrix, and classification report.
+- **Visualizations**: Heatmaps and class distribution plots saved to `outputs/`.
+
+## 4. Project Structure
+- `PRD.md`: Detailed requirements.
 - `PLAN.md`: Implementation steps.
 - `TODO.md`: Task tracking.
 - `main.py`: Main execution script.
+- `iris.csv`: Original dataset.
+- `iris_extended.csv`: The augmented dataset.
 - `outputs/`: Folder containing generated results and plots.
 
-## 4. How to Run
-1. Ensure you have the required libraries: `pandas`, `scikit-learn`, `matplotlib`, `seaborn`.
-2. Run the `main.py` script:
+## 5. How to Run
+1. Install requirements:
+   ```bash
+   pip install pandas numpy scikit-learn matplotlib seaborn
+   ```
+2. Run the script:
    ```bash
    python main.py
    ```
-3. Check the `outputs/` folder for the results.
-
-## 5. Requirements
-To run this project, install the following Python packages:
-```bash
-pip install pandas scikit-learn matplotlib seaborn
-```
+3. Results will be saved to the `outputs/` directory.

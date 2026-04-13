@@ -1,5 +1,6 @@
 import os
 import pandas as pd
+import numpy as np
 import seaborn as sns
 import matplotlib.pyplot as plt
 from sklearn import datasets
@@ -8,82 +9,114 @@ from sklearn.svm import SVC
 from sklearn.metrics import accuracy_score, confusion_matrix, classification_report, ConfusionMatrixDisplay
 
 def main():
-    # 1. Load the Iris dataset
-    # We'll use sklearn's built-in iris dataset for convenience and reliability.
-    iris = datasets.load_iris()
-    X = iris.data
-    y = iris.target
-    feature_names = iris.feature_names
-    target_names = iris.target_names
+    # 1. Load or Create the local iris.csv file
+    # If the file doesn't exist, we generate it from sklearn's built-in dataset.
+    dataset_path = 'iris.csv'
+    if not os.path.exists(dataset_path):
+        iris_sk = datasets.load_iris()
+        # Create a DataFrame with the original 3 classes
+        df_original = pd.DataFrame(data=iris_sk.data, columns=iris_sk.feature_names)
+        df_original['species'] = [iris_sk.target_names[i] for i in iris_sk.target]
+        df_original.to_csv(dataset_path, index=False)
+        print(f"Created initial {dataset_path} with 3 original classes.")
+    
+    # Load the dataset
+    df = pd.read_csv(dataset_path)
 
-    # 2. Explain the dataset structure: features, labels, and class categories.
-    print("Iris Dataset Structure:")
-    print(f"- Features: {feature_names}")
-    print(f"- Target Labels (Numerical): {set(y)}")
-    print(f"- Class Categories: {target_names}")
-    print(f"- Data shape: {X.shape}")
+    # 2. Inspect the dataset structure
+    # Identifying features and target column
+    print("Original Dataset structure:")
+    print(df.head())
+    print(f"Original Classes: {df['species'].unique()}")
     print("-" * 30)
 
-    # 3. Split the data into 80% train and 20% test
+    # 3. Create a synthetic fourth class named "Unknown"
+    # This class is added to make the classification task harder and test model uncertainty.
+    num_samples = 50
+    np.random.seed(42)
+    
+    # Analyze original feature ranges to generate "realistic" but distinct synthetic data
+    means = df.iloc[:, :-1].mean().values
+    stds = df.iloc[:, :-1].std().values
+    
+    synthetic_rows = []
+    for _ in range(num_samples):
+        # Generate synthetic features by adding random noise to the overall means.
+        # This creates a class that overlaps with the original data boundaries.
+        row = [
+            np.random.uniform(means[0] - stds[0], means[0] + stds[0] * 1.5),
+            np.random.uniform(means[1] - stds[1], means[1] + stds[1] * 1.5),
+            np.random.uniform(means[2] - stds[2], means[2] + stds[2] * 1.5),
+            np.random.uniform(means[3] - stds[3], means[3] + stds[3] * 1.5)
+        ]
+        synthetic_rows.append(row + ["Unknown"])
+    
+    # Create DataFrame for the synthetic class
+    df_synthetic = pd.DataFrame(synthetic_rows, columns=df.columns)
+
+    # 4. Append synthetic class rows to original dataset
+    df_extended = pd.concat([df, df_synthetic], ignore_index=True)
+    
+    # Save the new 4-class dataset
+    extended_path = 'iris_extended.csv'
+    df_extended.to_csv(extended_path, index=False)
+    print(f"Extended dataset with synthetic 'Unknown' class saved to {extended_path}.")
+
+    # 5. Split the extended dataset into 80% train and 20% test
+    X = df_extended.iloc[:, :-1]
+    y = df_extended['species']
     X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
 
-    # 4. Train an SVM classification model
-    # A Support Vector Machine (SVM) with a linear kernel is chosen for this multi-class task.
+    # 6. Train a classification model (SVM)
+    # Using a linear kernel to see how it handles the newly overlapping class.
     model = SVC(kernel='linear', C=1.0)
     model.fit(X_train, y_train)
 
-    # 5. Evaluate the model on the test set
+    # 7. Evaluate the model on the test set
     y_pred = model.predict(X_test)
-
-    # 6. Output: accuracy, confusion matrix, classification report
+    
+    # Generate evaluation metrics
     acc = accuracy_score(y_test, y_pred)
-    cm = confusion_matrix(y_test, y_pred)
-    cr = classification_report(y_test, y_pred, target_names=target_names)
+    unique_species = sorted(df_extended['species'].unique())
+    cm = confusion_matrix(y_test, y_pred, labels=unique_species)
+    cr = classification_report(y_test, y_pred)
 
-    print("Model Evaluation Result:")
+    print("\nModel Evaluation Results (4 Classes):")
     print(f"Accuracy: {acc:.4f}")
-    print("Confusion Matrix:")
-    print(cm)
     print("Classification Report:")
     print(cr)
 
-    # 7. Create visualizations
-    # Define outputs directory
-    current_dir = os.path.dirname(os.path.abspath(__file__))
-    output_dir = os.path.join(current_dir, "outputs")
+    # 8. Save outputs into an outputs folder
+    output_dir = 'outputs'
     if not os.path.exists(output_dir):
         os.makedirs(output_dir)
 
-    # Visualization A: Confusion Matrix Plot
-    plt.figure(figsize=(8, 6))
-    disp = ConfusionMatrixDisplay(confusion_matrix=cm, display_labels=target_names)
-    disp.plot(cmap='Blues', values_format='d')
-    plt.title('Confusion Matrix: SVM Iris Classifier')
-    plt.savefig(os.path.join(output_dir, 'confusion_matrix.png'))
-    plt.close()
-
-    # Visualization B: Pairplot of Features
-    # This helps understand feature relationships and species separation.
-    df = pd.DataFrame(X, columns=feature_names)
-    df['species'] = [target_names[i] for i in y]
-    sns.set_theme(style="ticks")
-    pairplot = sns.pairplot(df, hue="species", palette="husl", markers=["o", "s", "D"])
-    pairplot.fig.suptitle('Iris Dataset Feature Relationships (Pairplot)', y=1.02)
-    pairplot.savefig(os.path.join(output_dir, 'feature_pairplot.png'))
-    plt.close()
-
-    # 8. Save outputs (metrics) into an outputs folder
-    metrics_file = os.path.join(output_dir, 'evaluation_summary.txt')
-    with open(metrics_file, 'w') as f:
-        f.write("Iris Classification - SVM Model Evaluation\n")
-        f.write("=" * 45 + "\n")
-        f.write(f"Accuracy: {acc:.4f}\n\n")
-        f.write("Confusion Matrix:\n")
-        f.write(str(cm) + "\n\n")
+    # Save metrics text file
+    with open(os.path.join(output_dir, 'evaluation_metrics_extended.txt'), 'w') as f:
+        f.write("Evaluation Results for 4-Class Iris (Including Synthetic 'Unknown')\n")
+        f.write("=" * 65 + "\n")
+        f.write(f"Overall Accuracy: {acc:.4f}\n\n")
         f.write("Classification Report:\n")
         f.write(cr)
 
-    print(f"\nSUCCESS: Evaluation results and plots have been saved to: {output_dir}")
+    # 9. Create Visualizations
+    # A. Confusion Matrix Plot
+    plt.figure(figsize=(10, 8))
+    disp = ConfusionMatrixDisplay(confusion_matrix=cm, display_labels=unique_species)
+    disp.plot(cmap='Blues', values_format='d')
+    plt.title('Confusion Matrix: Iris Extended (4 Classes)')
+    plt.savefig(os.path.join(output_dir, 'confusion_matrix_extended.png'))
+    plt.close()
+
+    # B. Class Distribution Graph
+    plt.figure(figsize=(8, 6))
+    sns.countplot(x='species', data=df_extended, palette='viridis')
+    plt.title('Class Distribution (Original + Synthetic "Unknown")')
+    plt.ylabel('Number of Samples')
+    plt.savefig(os.path.join(output_dir, 'class_distribution_extended.png'))
+    plt.close()
+
+    print(f"\nAll visualizations and metrics have been saved to: {output_dir}/")
 
 if __name__ == "__main__":
     main()
