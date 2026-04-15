@@ -1,6 +1,8 @@
 # 4-Class Iris Classification Project
 
 This project extends the classic Iris classification task by introducing a **synthetic fourth class** named "Unknown". The goal is to evaluate how well a machine learning model can handle added uncertainty and distinguish between established species and a challenging new synthetic category.
+Parts of this project were developed with the assistance of AI tools such as Gemini.
+All code was reviewed and validated by the author.
 
 ## 1. Project Overview
 The dataset contains four features (sepal length, sepal width, petal length, and petal width) for:
